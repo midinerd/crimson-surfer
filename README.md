@@ -17,7 +17,8 @@ At the time of commit its behavior is:
 
 - Max/MSP
 - Python 3
-- the Max/MSP `shell` external added to Max/MSP's externals paths
+- `shell` External from Cycling'74 repo: [releases] (https://github.com/jeremybernstein/shell/releases)
+- - add `shell` to max/msp's external paths
 - The G1 Editor
 - A Nord Modular G1
 - The Max/MSP patcher will need its midi output port set to the port of your Nord Modular G1
