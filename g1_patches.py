@@ -17,7 +17,7 @@ def make_textfile():
     os.chdir(AUDIO_ROOTDIR)
     os.system('dir *.pch /s /b > g1-raw-patches.txt')
     txt = io.open(filename, 'r', encoding='utf8', errors='ignore')
-    final_text = io.open(os.path.join(AUDIO_ROOTDIR, 'g1-patches.txt', 'w'))
+    final_text = io.open(os.path.join(AUDIO_ROOTDIR, 'g1-patches.txt'), 'w')
     # convert path slashes for readability in max/msp \ -> /
     idx = 0
     for line in txt.readlines():
