@@ -10,7 +10,6 @@ import sys
 # currently only used/tested on win10 hence the cmd.exe and g:/ os bits lying around
 
 AUDIO_ROOTDIR = 'g:/audio'
-AUDIO_ROOTDIR = 'patches'
 
 def make_textfile():
     filename = 'g1-raw-patches.txt'
