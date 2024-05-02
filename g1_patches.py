@@ -58,10 +58,10 @@ def process_cmd_line():
                         epilog='') # shown at the bottom of the help message
     
     parser.add_argument('--maketext', default=False, action='store_true', help='Create a text file containing all of the Nord Modular patch names.')
-    parser.add_argument('--showpatch', default=None, type=int, help='Show the patch name specified by the patch number.')
+    parser.add_argument('--showpatch', default=None, type=int, metavar='PATCH_NUMBER', help='Show the patch name specified by the patch number.')
     args = parser.parse_args()
 
-    # check for no arguments passed
+    # check for no arguments passed, print help message
     if len(sys.argv) == 1:
         print()
         parser.print_help()
@@ -79,6 +79,7 @@ def main():
     elif args.showpatch is not None:
         patch_number = args.showpatch
         get_patch(patch_number)
+
     return status
 
 if __name__ == "__main__":
