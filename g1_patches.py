@@ -10,13 +10,14 @@ import sys
 # currently only used/tested on win10 hence the cmd.exe and g:/ os bits lying around
 
 AUDIO_ROOTDIR = 'g:/audio'
+AUDIO_ROOTDIR = 'patches'
 
 def make_textfile():
     filename = 'g1-raw-patches.txt'
     os.chdir(AUDIO_ROOTDIR)
     os.system('dir *.pch /s /b > g1-raw-patches.txt')
     txt = io.open(filename, 'r', encoding='utf8', errors='ignore')
-    final_text = io.open(os.path.join(AUDIO_ROOTDIR, 'g1-patches.txt', 'w')
+    final_text = io.open(os.path.join(AUDIO_ROOTDIR, 'g1-patches.txt', 'w'))
     # convert path slashes for readability in max/msp \ -> /
     idx = 0
     for line in txt.readlines():
