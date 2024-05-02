@@ -15,49 +15,69 @@ import sys
 AUDIO_ROOTDIR = 'patches'
 filename = '%s\\g1-raw-patches.txt' % AUDIO_ROOTDIR
 
+def read_patches(filename):
+    with open(filename,'r') as fh:
+        patch_names = fh.readlines()
+    return patch_names
+
+
 def make_textfile():
 
     # generate a list of G1 patch names, write them to a file
     os.system('dir %s\\*.pch /s /b > %s' % (AUDIO_ROOTDIR, filename))
     
-    with open(filename,'r') as fh:
-        patch_names = fh.readlines()
-
+    patch_names = read_patches(filename)
+    
     # replace \\ with / , write back to same file in order to be compatible with MAX
     with open(filename, 'w') as fh:
         for line in patch_names:
             fh.write(line.replace('\\','/'))
 
-    get_patch(0)
+    get_patch(1)
+
 
 def get_patch(patch_number):
 
-    with open(filename,'r') as fh:
-        patch_names = fh.readlines()
+    patch_names = read_patches(filename)
+    patch_count = len(patch_names) #
 
-    for line_number, line in enumerate(patch_names):
-        if line_number == patch_number:
-            print('\n%s' % line)
-            break
+    if patch_number > patch_count:
+        print('\nThere are only %d patches in the file. You specified Patch # %d\n' % (patch_count, patch_number))
+    else:
+        for line_number, line in enumerate(patch_names, start=1):
+            if line_number == patch_number:
+                print('\n%s' % line)
+                break
+
 
 def process_cmd_line():
 
     parser = argparse.ArgumentParser(
                         prog='g1_patches',
                         description='Makes a texfile containing the filenames of Nord Modular G1 patches.',
-                        epilog='Text at the bottom of help')
+                        epilog='') # shown at the bottom of the help message
+    
     parser.add_argument('--maketext', default=False, action='store_true', help='Create a text file containing all of the Nord Modular patch names.')
-    parser.add_argument('--getpatch', default=None, type=int, help='TBD')
+    parser.add_argument('--showpatch', default=None, type=int, help='Show the patch name specified by the patch number.')
     args = parser.parse_args()
+
+    # check for no arguments passed
+    if len(sys.argv) == 1:
+        print()
+        parser.print_help()
+        sys.exit(1) #exit with an error code
+
     return args
 
+
 def main():
+
     status = 0
     args = process_cmd_line()
     if args.maketext:
         make_textfile()
-    elif args.getpatch is not None:
-        patch_number = args.getpatch
+    elif args.showpatch is not None:
+        patch_number = args.showpatch
         get_patch(patch_number)
     return status
 
