@@ -11,7 +11,8 @@ def generate_patch_file(patch_dir):
     """
     
     print(f"\nMaking catalog of G1 patches found in directory: {patch_dir}")
-    return list(Path(patch_dir).rglob('*.pch'))
+    return list(Path(patch_dir).rglob('*.pch', case_sensitive=None))
+    # return Path(patch_dir).rglob('*.zaxd')
 
 
 def make_textfile(patch_dir, max_patch_file):
@@ -24,11 +25,13 @@ def make_textfile(patch_dir, max_patch_file):
     if patch_names:
         with open(max_patch_file, 'w', encoding="utf-8") as fh_out:
             # loop over the raw patch names, write them to the file that will be used by MAX
+            patch_count = 0
             for patch in patch_names:
                 # replace \\ with / , write back to same file in order to be compatible with MAX
                 fh_out.write(f"{str(patch.absolute()).replace('\\','/')}\n")
+                patch_count += 1
 
-        print(f"\n{len(patch_names):,} patches were found and written to {max_patch_file}.\n")
+        print(f"\n{patch_count:,} patches were found and written to {max_patch_file}.\n")
     else:
         status = 1
         print("\nERROR. No patch names were found at {patch_dir}.\n\n")
@@ -65,7 +68,7 @@ def show_patch(max_patchfile, patch_number):
             patch_count = len(patch_names)
 
             if patch_number > patch_count:
-                print(f'\nThere are only {patch_count} patches in the file. You specified Patch # {patch_number}\n')
+                print(f'\nYou specified Patch # {patch_number}, but there are only {patch_count} patches in {max_patchfile}.\n')
             else:
                 for line_number, line in enumerate(patch_names, start=1):
                     if line_number == patch_number:
