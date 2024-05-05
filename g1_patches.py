@@ -10,51 +10,59 @@ import sys
 
 
 def generate_patch_file(patch_dir):
-    # generate a list of G1 patch names, write them to a file
+    # generate a list of G1 patch names, return them to the caller as a Python list, for simple iteration.
     print(f"\nMaking catalog of G1 patches found in directory: {patch_dir}")
-    # os.system('dir %s\\*.pch /s /b > %s' % (AUDIO_ROOTDIR, raw_patch_filenames))
     return list(Path(patch_dir).rglob('*.pch'))
+
 
 def make_textfile(patch_dir, max_patch_file):
     """
-    Generate a list of all of the patch names found, write the list of patch names to a different file
-    for MAX/Msp, which requires the \\ be changed to /.
+    Iterate over a list of patch names, replace the \\ be changed to / to be comptible with MAX/Msp
     """
 
     patch_names = generate_patch_file(patch_dir)
-    # print(patch_names)
     if patch_names:
-        # replace \\ with / , write back to same file in order to be compatible with MAX
         with open(max_patch_file, 'w') as fh_out:
             # loop over the raw patch names, write them to the file that will be used by MAX
-            for line in patch_names:
-                fh_out.write(str(line).replace('\\','/'))
+            for patch in patch_names:
+                # replace \\ with / , write back to same file in order to be compatible with MAX
+                fh_out.write(f"{str(patch.absolute()).replace('\\','/')}\n")
 
         print(f"\n{len(patch_names)} patches were found and written to {patch_dir}\\{max_patch_file}.\n")
     else:
         print("\nERROR. No patch names were found at {patch_dir}.\n\n")
 
 
-def show_patch(raw_patch_file, patch_number):
+def read_patches(max_patchfile):
+
+    patches = []
+    with open(max_patchfile, 'r') as fh_in:
+        patches = fh_in.readlines()
+
+    return patches
+
+
+def show_patch(max_patchfile, patch_number):
     """
     Display the patch name specified by the patch number that is passed on the command line
     """
 
+    if Path(max_patchfile).exists():
+        patch_names = read_patches(max_patchfile)
+        if patch_names:
+            patch_count = len(patch_names)
 
-    patch_names = read_patches(raw_patch_file)
-    if patch_names:
-        patch_count = len(patch_names)
-
-        if patch_number > patch_count:
-            print('\nThere are only %d patches in the file. You specified Patch # %d\n' % (patch_count, patch_number))
+            if patch_number > patch_count:
+                print('\nThere are only %d patches in the file. You specified Patch # %d\n' % (patch_count, patch_number))
+            else:
+                for line_number, line in enumerate(patch_names, start=1):
+                    if line_number == patch_number:
+                        print(f'\n\tPatch #{patch_number}: {line}')
+                        break
         else:
-            for line_number, line in enumerate(patch_names, start=1):
-                if line_number == patch_number:
-                    print(f'\n\tPatch #{patch_number}: {line}')
-                    break
+            print("\nERROR. No patch names were found at {AUDIO_ROOTDIR}.\n\n")
     else:
-        print("\nERROR. No patch names were found at {AUDIO_ROOTDIR}.\n\n")
-
+        print(f'\n\n\t{max_patchfile} was not found. You must run the program with the --maketext argument first.')
 
 def process_cmd_line():
 
@@ -66,6 +74,10 @@ def process_cmd_line():
     parser.add_argument('--maketext', default=False, action='store_true', help='Create a text file containing all of the Nord Modular patch names.')
     parser.add_argument('--showpatch', default=None, type=int, metavar='PATCH_NUMBER', help='Show the patch name specified by the patch number. This assumes the program has been previously run with the "maketext" argument.')
     parser.add_argument('--patchdir', default='patches', help='The directory where the patches are located. The default directory is "patches" in the current directory.')
+    # parser.add_argument('--patchdir', default='patches', help='The directory where the patches are located. The default directory is "patches" in the current directory.')
+    # parser.add_argument('--patchdir', default='patches', help='The directory where the patches are located. The default directory is "patches" in the current directory.')
+
+
     args = parser.parse_args()
 
     # check for no arguments passed, print help message
