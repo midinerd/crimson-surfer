@@ -1,8 +1,49 @@
 # copyright crissaegrim/midinerd(c) 2024  whatever that means.
 
 import argparse
+from collections import namedtuple
+from editor_interface import EditorInterface
+import configparser as cfg
 from pathlib import Path
 import sys
+
+
+def read_config_file(config_file='editor_config.ini'):
+    """
+    Read the parameters from the config file so that the program
+    knows where the editor is and which midi channel to use
+
+    Args:
+        config_file (optional): _description_. Defaults to 'NordConfig.ini'.
+
+    Returns:
+        str: absolute path to the nord editor including the the editor name
+        int: the midi channel to use when sending notes to the editor
+    """
+
+    config = cfg.ConfigParser()
+    if not config.read(config_file):
+        print(f'\nERROR occurred reading config file: {config_file}\n')
+        return None
+
+
+    editor_path = config['PATH']['nordeditor']
+    midi_channel = int(config['MIDI']['MidiChannel'])
+    note_delay = int(config['NOTES']['Delay'])
+    num_notes  = int(config['NOTES']['NumNotes'])
+
+    EditorParams = namedtuple("Params", "path channel delay notes")
+    params = EditorParams(editor_path, midi_channel, note_delay, num_notes)
+
+    return params
+
+
+def write_default_config():
+    """
+    When a config file isn't found, write a default file so that the user
+    knows what the config file entries should look like
+    """
+    pass
 
 
 def generate_patch_file(patch_dir):
@@ -98,9 +139,7 @@ def process_cmd_line():
     parser.add_argument('--maketext', default=False, action='store_true', help='Create a text file containing all of the Nord Modular patch names.')
     parser.add_argument('--showpatch', default=None, type=int, metavar='PATCH_NUMBER', help='Show the patch name specified by the patch number. This assumes the program has been previously run with the "maketext" argument.')
     parser.add_argument('--patchdir', default=None, help='The directory where the patches are located. The default directory is "patches" in the current directory.')
-    # parser.add_argument('--patchdir', default='patches', help='The directory where the patches are located. The default directory is "patches" in the current directory.')
-    # parser.add_argument('--patchdir', default='patches', help='The directory where the patches are located. The default directory is "patches" in the current directory.')
-
+    parser.add_argument('play', default=None, help='Start the Nord Editor, send it a patch and some notes to play it.')
 
     args = parser.parse_args()
 
@@ -111,6 +150,32 @@ def process_cmd_line():
         sys.exit(1) #exit with an error code
 
     return args
+
+
+def play_patches(editor_params):
+    """
+    Instantiate the NM editor in a subprocess and start sending patches to it.
+    """
+
+    editor = EditorInterface(editor_params.path, editor_params.channel, editor_params.delay, editor_params.notes)
+    editor.start_editor()
+
+    # patches = ["C:/Users/cappy/Documents/source/python/nord/crimson-surfer/../patches/3Phase/Grainalizzer02-4.pch",
+    # "C:/Users/cappy/Documents/source/python/nord/crimson-surfer/../patches/7uke/AllHouseToMe.pch",
+    # "C:/Users/cappy/Documents/source/python/nord/crimson-surfer/../patches/7uke/CampFire.pch",
+    # "C:/Users/cappy/Documents/source/python/nord/crimson-surfer/../patches/7uke/DisjunctionPercussionWithFunKnobs.pch"
+    # ]
+
+    # import time
+
+    # for this_patch in patches:
+    #     print(f"\tSENDING: {this_patch}")
+    #     editor.send_patch(this_patch)
+    
+    #     time.sleep(8)
+
+
+
 
 
 def main():
@@ -129,13 +194,20 @@ def main():
         patch_dir = args.patchdir # the user specified a directory on the cmd line
     else:
         patch_dir = 'patches' # default patch directory when the user doesn't specify one
-    max_patchfile = rf'{patch_dir}\g1-patches-max.txt'
+    max_patchfile = str(Path(rf'{patch_dir}\g1-patches-max.txt').absolute())
+
 
     if args.maketext:
         status = make_textfile(patch_dir, max_patchfile)
     elif args.showpatch is not None:
         patch_number = args.showpatch
         status = show_patch(max_patchfile, patch_number)
+    elif args.play is not None:
+        params = read_config_file()
+        if params is not None:
+            play_patches(params)
+        else:
+            status = 1
 
     return status
 
