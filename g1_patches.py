@@ -51,7 +51,7 @@ def write_default_config():
 
 def generate_patch_file(patch_dir):
     """
-    generate a list of G1 patch names, return them to the caller as a Python list, for simple iteration.
+    Return a generator object of G1 patch names, return them to the caller as a Python list, for simple iteration.
     """
     
     print(f"\nMaking catalog of G1 patches found in directory: {patch_dir}")
@@ -66,7 +66,7 @@ def make_textfile(patch_dir, max_patch_file):
     status = 0
 
     patch_names = generate_patch_file(patch_dir)
-    if patch_names:
+    if patch_names is not None:
         with open(max_patch_file, 'w', encoding="utf-8") as fh_out:
             # loop over the raw patch names, write them to the file that will be used by MAX
             patch_count = 0
@@ -94,8 +94,11 @@ def read_patches(max_patchfile):
     """
 
     patches = []
-    with open(max_patchfile, 'r', encoding="utf-8") as fh_in:
-        patches = fh_in.readlines()
+    if Path(max_patchfile).exists():
+        with open(max_patchfile, 'r', encoding="utf-8") as fh_in:
+            patches = fh_in.readlines()
+    else:
+        print(f"\nERROR: {max_patchfile} does not exist. You must run the program with the --maketext argument, FIRST.\n")
     return patches
 
 
@@ -141,7 +144,7 @@ def process_cmd_line():
     parser.add_argument('--maketext', default=False, action='store_true', help='Create a text file containing all of the Nord Modular patch names.')
     parser.add_argument('--showpatch', default=None, type=int, metavar='PATCH_NUMBER', help='Show the patch name specified by the patch number. This assumes the program has been previously run with the "maketext" argument.')
     parser.add_argument('--patchdir', default=None, help='The directory where the patches are located. The default directory is "patches" in the current directory.')
-    # parser.add_argument('play', default=None, help='Start the Nord Editor, send it a patch and some notes to play it.')
+    parser.add_argument('--play', default=False, action='store_true', help='Start the Nord Editor, send it a patch and some notes to play it.')
 
     args = parser.parse_args()
 
@@ -165,15 +168,21 @@ def play_patches(editor_params, patch_file):
     print()
 
     # editor.play_patches() # TBD
+    status = 0
     try:
         for patch_num, this_patch in enumerate(patch_names, start=1):
             print(f"\t{patch_num:5} SENDING: {this_patch}",end='')
-            editor.send_patch(this_patch)
-        
+            status = editor.send_patch(this_patch)
+            if status:
+                break
             time.sleep(8)
     except KeyboardInterrupt:
         print("\n\tUSER ABORT\n\n")
 
+    if not status:
+        print("\nDone playing patches\n")
+        
+    return status
 
 
 # https://github.com/jeremybernstein/shell
@@ -191,22 +200,19 @@ def main():
     args = process_cmd_line()
 
     if args.patchdir is not None:
-        patch_dir = args.patchdir # the user specified a directory on the cmd line
+        patch_dir = args.patchdir # the user specified a patch directory on the cmd line
     else:
         patch_dir = 'patches' # default patch directory when the user doesn't specify one
     max_patchfile = str(Path(rf'{patch_dir}\g1-patches-max.txt').resolve())
     
-    if not args.maketext:
-        if Path(max_patchfile).exists():
-            patch_names = read_patches(max_patchfile)
-            TBD need to finish this- read once, pass list to funcs that need it
-
-    if args.maketext:
+    if args.maketext:        
         status = make_textfile(patch_dir, max_patchfile)
-    elif args.showpatch is not None:
+
+    if args.showpatch is not None:
         patch_number = args.showpatch
         status = show_patch(max_patchfile, patch_number)
-    elif args.play is not None:
+
+    if args.play:
         editor_params = read_config_file()
         if editor_params is not None:
             play_patches(editor_params, max_patchfile)
