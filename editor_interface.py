@@ -24,11 +24,17 @@ class EditorInterface:
         Args:
              (str): A string containing the absolute path to a G1 patch file
         """
+        status = 0
+        try:
+            args = [self.editor_path, absolute_path_to_patch.strip()]
+            self.editor = sub.Popen(args, universal_newlines=True, shell=False)
+            # self.editor.stdin.write(absolute_path_to_patch) # writing to stdin doesn't work
+        except FileNotFoundError:
+            status = 1
+            print(f"\nERROR: File Not Found: {self.editor_path}\n")
 
-        args = [self.editor_path, absolute_path_to_patch.strip()]
-        self.editor = sub.Popen(args, universal_newlines=True, shell=False)
-        # self.editor.stdin.write(absolute_path_to_patch) # writing to stdin doesn't work
-        
+        return status
+    
     def play_patches(self, patch_file):
         """
         Loop over all of the patches in patch_file. When playing all of the patches is done,
