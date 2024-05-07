@@ -10,11 +10,17 @@ import time
 
 from editor_interface import EditorInterface
 
+# putting the namedtuple definition here allows VScode to resolve the fields
+EditorParams = namedtuple("Params", "editor_path midi_channel note_delay num_notes")
 
-def read_config_file(config_file='editor_config.ini'):
+
+def read_config_file(config_file='editor_config.ini') -> EditorParams:
     """
     Read the parameters from the config file so that the program
-    knows where the editor is and which midi channel to use
+    knows where the editor is and which midi channel to use.
+
+    The config file is read every time the user uses the --play argument on the cmd
+    line, so that the changes entered into the config file will be used during the next play session.
 
     Args:
         config_file (optional): _description_. Defaults to 'NordConfig.ini'.
@@ -31,11 +37,11 @@ def read_config_file(config_file='editor_config.ini'):
 
 
     editor_path = config['PATH']['nordeditor']
-    midi_channel = int(config['MIDI']['MidiChannel'])
-    note_delay = int(config['NOTES']['Delay'])
-    num_notes  = int(config['NOTES']['NumNotes'])
+    midi_channel = int(config['MIDI']['midi_channel'])
+    note_delay = int(config['NOTES']['note_delay'])
+    num_notes  = int(config['NOTES']['num_notes'])
 
-    EditorParams = namedtuple("Params", "path channel delay notes")
+    #EditorParams = namedtuple("Params", "editor_path midi_channel note_delay num_notes")
     params = EditorParams(editor_path, midi_channel, note_delay, num_notes)
 
     return params
@@ -67,15 +73,18 @@ def make_textfile(patch_dir, max_patch_file):
 
     patch_names = generate_patch_file(patch_dir)
     if patch_names is not None:
-        with open(max_patch_file, 'w', encoding="utf-8") as fh_out:
-            # loop over the raw patch names, write them to the file that will be used by MAX
-            patch_count = 0
-            for patch in patch_names:
-                # replace \\ with / , write back to same file in order to be compatible with MAX
-                fh_out.write(f"{str(patch.resolve()).replace('\\','/')}\n")
-                patch_count += 1
-
-        print(f"\n{patch_count:,} patches were found and written to {max_patch_file}.\n")
+        try:
+            with open(max_patch_file, 'w', encoding="utf-8") as fh_out:
+                # loop over the raw patch names, write them to the file that will be used by MAX
+                patch_count = 0
+                for patch in patch_names:
+                    # replace \\ with / , write back to same file in order to be compatible with MAX
+                    fh_out.write(f"{str(patch.resolve()).replace('\\','/')}\n")
+                    patch_count += 1
+                print(f"\n{patch_count:,} patches were found and written to {max_patch_file}.\n")
+        except FileNotFoundError:
+            status = 1
+            print(f"\nERROR: The '{patch_dir}' directory does not exist.\n")
     else:
         status = 1
         print("\nERROR. No patch names were found at {patch_dir}.\n\n")
@@ -157,36 +166,39 @@ def process_cmd_line():
     return args
 
 
-def play_patches(editor_params, patch_file):
+def play_patches(editor_params: EditorParams, patch_file):
     """
     Instantiate the NM editor in a subprocess and start sending patches to it.
     """
 
-    editor = EditorInterface(editor_params.path, editor_params.channel, editor_params.delay, editor_params.notes)
+    # create an instance of the editor inteface so that this program can send patches to the editor
+    editor = EditorInterface(editor_params.editor_path, editor_params.midi_channel, editor_params.note_delay, editor_params.num_notes)
 
     patch_names = read_patches(patch_file)
-    print()
+    if patch_names:
+        print()
 
-    # editor.play_patches() # TBD
-    status = 0
-    try:
-        for patch_num, this_patch in enumerate(patch_names, start=1):
-            print(f"\t{patch_num:5} SENDING: {this_patch}",end='')
-            status = editor.send_patch(this_patch)
-            if status:
-                break
-            time.sleep(8)
-    except KeyboardInterrupt:
-        print("\n\tUSER ABORT\n\n")
+        status = 0
+        try:
+            for patch_num, this_patch in enumerate(patch_names, start=1):
+                print(f"\t{patch_num:5} SENDING: {this_patch}",end='')
+                status = editor.send_patch(this_patch)
+                if status:
+                    break
+                time.sleep(editor_params.note_delay)
+        except KeyboardInterrupt:
+            print("\n\tUSER ABORT\n\n")
 
-    if not status:
-        print("\nDone playing patches\n")
-        
+        if not status:
+            print("\nDone playing patches\n")
+    else:
+        status = 1
+
     return status
 
 
-# https://github.com/jeremybernstein/shell
-# the MAX shell object
+# https://github.com/jeremybernstein/shell/releases
+# the MAX shell object - binaries
 def main():
     """
     Entry point for the program
