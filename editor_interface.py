@@ -32,6 +32,10 @@ class EditorInterface:
         except FileNotFoundError:
             status = 1
             print(f"\nERROR: File Not Found: {self.editor_path}\n")
+        except sub.SubprocessError as exc:
+            status = 1
+            print(f'\nERROR occurred sending {absolute_path_to_patch} to the Nord Editor: {exc}\n\n')
+
 
         return status
     
