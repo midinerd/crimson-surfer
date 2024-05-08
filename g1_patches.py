@@ -105,7 +105,8 @@ def read_patches(max_patchfile):
     patches = []
     if Path(max_patchfile).exists():
         with open(max_patchfile, 'r', encoding="utf-8") as fh_in:
-            patches = fh_in.readlines()
+            # patches = fh_in.readlines()
+            patches = fh_in.read().splitlines() # gets rid of the newline at the end
     else:
         print(f"\nERROR: {max_patchfile} does not exist. You must run the program with the --maketext argument, FIRST.\n")
     return patches
@@ -181,16 +182,14 @@ def play_patches(editor_params: EditorParams, patch_file):
         status = 0
         try:
             for patch_num, this_patch in enumerate(patch_names, start=1):
-                print(f"\t{patch_num:5} SENDING: {this_patch}",end='')
+                print(f"\t{patch_num:5} SENDING: '{this_patch}'")
                 status = editor.send_patch(this_patch)
                 if status:
+                    print(f'\n\nAn error occurred while sending "{Path(this_patch).name}" to the editor.')
                     break
                 time.sleep(editor_params.note_delay)
         except KeyboardInterrupt:
             print("\n\tUSER ABORT\n\n")
-
-        if not status:
-            print("\nDone playing patches\n")
     else:
         status = 1
 
@@ -217,7 +216,7 @@ def main():
         patch_dir = 'patches' # default patch directory when the user doesn't specify one
     max_patchfile = str(Path(rf'{patch_dir}\g1-patches-max.txt').resolve())
     
-    if args.maketext:        
+    if args.maketext:      
         status = make_textfile(patch_dir, max_patchfile)
 
     if args.showpatch is not None:
@@ -227,11 +226,12 @@ def main():
     if args.play:
         editor_params = read_config_file()
         if editor_params is not None:
-            play_patches(editor_params, max_patchfile)
+            status = play_patches(editor_params, max_patchfile)
         else:
             status = 1
-
+    print(f'\n\t Exiting the program with status: {status}\n\n')
     return status
 
 if __name__ == "__main__":
     sys.exit(main())
+    
