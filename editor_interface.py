@@ -2,6 +2,7 @@
 This module provides an interface from the Nord Modular Editor to the program
 used to control it
 """
+from pathlib import Path
 import subprocess as sub
 
 class EditorInterface:
@@ -34,7 +35,7 @@ class EditorInterface:
             print(f"\nERROR: File Not Found: {self.editor_path}\n")
         except sub.SubprocessError as exc:
             status = 1
-            print(f'\nERROR occurred sending {absolute_path_to_patch} to the Nord Editor: {exc}\n\n')
+            print(f'\nERROR occurred sending {Path(absolute_path_to_patch).name} to the Nord Editor: {exc}\n\n')
 
 
         return status
