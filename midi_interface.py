@@ -3,6 +3,7 @@ MIDI port access easier for the user
 """
 
 import mido
+# import mido.backends.portmidi
 
 class MidiInterface:
     """ Provide simple access to the midi ports
