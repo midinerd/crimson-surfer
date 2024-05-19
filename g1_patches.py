@@ -8,6 +8,8 @@ import sys
 import time
 
 
+from midi_interface import MidiInterface
+
 from editor_interface import EditorInterface
 
 # putting the namedtuple definition here allows VScode to resolve the fields
@@ -155,6 +157,7 @@ def process_cmd_line():
     parser.add_argument('--showpatch', default=None, type=int, metavar='PATCH_NUMBER', help='Show the patch name specified by the patch number. This assumes the program has been previously run with the "maketext" argument.')
     parser.add_argument('--patchdir', default=None, help='The directory where the patches are located. The default directory is "patches" in the current directory.')
     parser.add_argument('--play', default=False, action='store_true', help='Start the Nord Editor, send it a patch and some notes to play it.')
+    parser.add_argument('--show_ports', default=False, action='store_true', help='Display the Midi out ports on the system.')
 
     args = parser.parse_args()
 
@@ -210,6 +213,8 @@ def main():
     status = 0
     args = process_cmd_line()
 
+    midi = MidiInterface()
+
     if args.patchdir is not None:
         patch_dir = args.patchdir # the user specified a patch directory on the cmd line
     else:
@@ -229,6 +234,12 @@ def main():
             status = play_patches(editor_params, max_patchfile)
         else:
             status = 1
+
+    if args.show_ports:
+        print("\nMidi Out Ports available to this program.\n")
+        for enum, port in enumerate(midi.get_midi_output_ports()):
+            print(f'Port # {enum}  {port}')
+
     print(f'\n\t Exiting the program with status: {status}\n\n')
     return status
 
