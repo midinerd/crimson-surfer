@@ -28,9 +28,10 @@ def process_cmd_line():
 
     # check for no arguments passed, print help message
     if len(sys.argv) == 1:
+        args = None
         print()
         parser.print_help()
-        sys.exit(1) #exit with an error code
+        # sys.exit(1) #exit with an error code
 
     return args
 
@@ -46,32 +47,35 @@ def main():
         int: status value indicating if the program was successful or not. 0 = success, non-zero is error/failure
     """
 
-
     status = 0
     args = process_cmd_line()
-
-    player = PatchPlayer()
-
-    if args.patchdir is not None:
-        patch_dir = args.patchdir # the user specified a patch directory on the cmd line
-    else:
-        patch_dir = 'patches' # default patch directory when the user doesn't specify one
-    max_patchfile = str(Path(rf'{patch_dir}\g1-patches-max.txt').resolve())
     
-    if args.maketext:      
-        status = player.make_textfile(patch_dir, max_patchfile)
+    if args is not None:
+        player = PatchPlayer()
 
-    if args.showpatch is not None:
-        patch_number = args.showpatch
-        status = player.show_patch(max_patchfile, patch_number)
+        if args.patchdir is not None:
+            patch_dir = args.patchdir # the user specified a patch directory on the cmd line
+        else:
+            patch_dir = 'patches' # default patch directory when the user doesn't specify one
+        max_patchfile = str(Path(rf'{patch_dir}\g1-patches-max.txt').resolve())
+        
+        if args.maketext:      
+            status = player.make_textfile(patch_dir, max_patchfile)
 
-    if args.play:
-        status = player.play_patches(max_patchfile)
+        if args.showpatch is not None:
+            patch_number = args.showpatch
+            status = player.show_patch(max_patchfile, patch_number)
 
-    if args.showports:
-        player.show_ports()
+        if args.play:
+            status = player.play_patches(max_patchfile)
 
-    print(f'\n\t Exiting the program with status: {status}\n\n')
+        if args.showports:
+            player.show_ports()
+
+        print(f'\n\t Exiting the program with status: {status}\n\n')
+    else:
+        status = 1 # error
+            
     return status
 
 if __name__ == "__main__":
