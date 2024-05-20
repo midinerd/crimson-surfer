@@ -11,7 +11,7 @@ from editor_interface import EditorInterface
 
 # from config_reader import EditorParams
 from config_reader import read_config_file
-
+from config_reader import EditorParams
 
 
 class PatchPlayer:
@@ -21,19 +21,18 @@ class PatchPlayer:
     """
 
     def __init__(self):
-        self.midi_interface = MidiInterface()
         self.editor_params = read_config_file()
+        self.midi_interface = MidiInterface(self.editor_params.midi_port, self.editor_params.midi_channel)
 
         # create an instance of the editor interface so that this program can send patches to the editor
-        self.editor = EditorInterface(self.editor_params.editor_path, self.editor_params.midi_channel, 
-                                      self.editor_params.note_delay, self.editor_params.num_notes)
+        self.editor = EditorInterface(self.editor_params.editor_path)
 
 
     def play_patches(self, patch_file):
         """
-        Instantiate the NM editor in a subprocess and start sending patches to it.
+        Sending patches to the NM editor, then send some midi notes based on the parameters
+        in the config file.
         """
-
 
         patch_names = self.read_patches(patch_file)
         if patch_names:
@@ -47,14 +46,25 @@ class PatchPlayer:
                     if status:
                         print(f'\n\nAn error occurred while sending "{Path(this_patch).name}" to the editor.')
                         break
-                    time.sleep(self.editor_params.note_delay)
+                    else:
+                        self.send_notes()
+                    time.sleep(4)
             except KeyboardInterrupt:
                 print("\n\tUSER ABORT\n\n")
         else:
             status = 1
-
         return status
 
+    def send_notes(self):
+        """_summary_
+        """
+        # params = EditorParams(editor_path, midi_port, midi_channel, note_delay, midi_notes)
+
+        midi_notes = self.editor_params.midi_notes
+        for this_note in midi_notes:
+            self.midi_interface.send_note(this_note)
+            time.sleep(2) #
+            self.midi_interface.panic() # turn notes off before going to the next patch
 
     def read_patches(self, max_patchfile):
         """
