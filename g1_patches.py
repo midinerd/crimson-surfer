@@ -28,10 +28,9 @@ def process_cmd_line():
 
     # check for no arguments passed, print help message
     if len(sys.argv) == 1:
-        args = None
+        args = None # tells the caller to exit
         print()
-        parser.print_help()
-        # sys.exit(1) #exit with an error code
+        parser.print_help() # show the help message when no arguments are passed.
 
     return args
 
