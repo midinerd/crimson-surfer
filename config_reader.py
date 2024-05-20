@@ -2,7 +2,7 @@ from collections import namedtuple
 import configparser as cfg
 
 # putting the namedtuple definition here allows VScode to resolve the fields
-EditorParams = namedtuple("Params", "editor_path midi_port midi_channel note_delay num_notes")
+EditorParams = namedtuple("Params", "editor_path midi_port midi_channel note_delay midi_notes")
 
 
 def read_config_file(config_file='editor_config.ini') -> EditorParams:
@@ -31,9 +31,9 @@ def read_config_file(config_file='editor_config.ini') -> EditorParams:
     midi_port = config['MIDI']['midi_port_name']
     midi_channel = int(config['MIDI']['midi_channel'])
     note_delay = int(config['NOTES']['note_delay'])
-    num_notes  = int(config['NOTES']['num_notes'])
+    midi_notes  = eval(config['NOTES']['midi_notes'])
 
-    params = EditorParams(editor_path, midi_port, midi_channel, note_delay, num_notes)
+    params = EditorParams(editor_path, midi_port, midi_channel, note_delay, midi_notes)
 
     return params
 
