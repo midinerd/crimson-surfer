@@ -48,6 +48,7 @@ def main():
 
     status = 0
     args = process_cmd_line()
+    player = None
     
     if args is not None:
         try:
@@ -72,8 +73,8 @@ def main():
             if args.play:
                 status = player.play_patches(max_patchfile)
 
-        if args.showports:
-            player.show_ports()
+            if args.showports:
+                player.show_ports()
 
         print(f'\n\t Exiting the program with status: {status}\n\n')
     else:

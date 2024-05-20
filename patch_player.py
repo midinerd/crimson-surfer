@@ -28,43 +28,6 @@ class PatchPlayer:
         self.editor = EditorInterface(self.editor_params.editor_path)
 
 
-    def play_patches(self, patch_file):
-        """
-        Sending patches to the NM editor, then send some midi notes based on the parameters
-        in the config file.
-        """
-
-        patch_names = self.read_patches(patch_file)
-        if patch_names:
-            print()
-
-            status = 0
-            try:
-                for patch_num, this_patch in enumerate(patch_names, start=1):
-                    print(f"\t{patch_num:5} SENDING: '{this_patch}'")
-                    status = self.editor.send_patch(this_patch)
-                    if status:
-                        print(f'\n\nAn error occurred while sending "{Path(this_patch).name}" to the editor.')
-                        break
-                    else:
-                        self.send_notes()
-                    time.sleep(4)
-            except KeyboardInterrupt:
-                print("\n\tUSER ABORT\n\n")
-        else:
-            status = 1
-        return status
-
-    def send_notes(self):
-        """Send midi notes to the midi out port, using the note sequence
-        read from the config file
-        """
-        midi_notes = self.editor_params.midi_notes
-        for this_note in midi_notes:
-            self.midi.send_note(this_note)
-            time.sleep(2) #
-            self.midi.panic() # turn notes off before going to the next patch
-
     def read_patches(self, max_patchfile):
         """
 
@@ -149,6 +112,43 @@ class PatchPlayer:
 
         return status
 
+    # the methods below require that the MidiInterface object was successful opening a MIDI out port 
+    def play_patches(self, patch_file):
+        """
+        Sending patches to the NM editor, then send some midi notes based on the parameters
+        in the config file.
+        """
+
+        patch_names = self.read_patches(patch_file)
+        if patch_names:
+            print()
+
+            status = 0
+            try:
+                for patch_num, this_patch in enumerate(patch_names, start=1):
+                    print(f"\t{patch_num:5} SENDING: '{this_patch}'")
+                    status = self.editor.send_patch(this_patch)
+                    if status:
+                        print(f'\n\nAn error occurred while sending "{Path(this_patch).name}" to the editor.')
+                        break
+                    else:
+                        self.send_notes()
+                    time.sleep(4)
+            except KeyboardInterrupt:
+                print("\n\tUSER ABORT\n\n")
+        else:
+            status = 1
+        return status
+
+    def send_notes(self):
+        """Send midi notes to the midi out port, using the note sequence
+        read from the config file
+        """
+        midi_notes = self.editor_params.midi_notes
+        for this_note in midi_notes:
+            self.midi.send_note(this_note)
+            time.sleep(2) #
+            self.midi.panic() # turn notes off before going to the next patch
 
     def show_ports(self):
         """Display the MIDI out ports so the user can choose which one to use
@@ -156,3 +156,4 @@ class PatchPlayer:
         print("\nMidi Out Ports available to this program.\n")
         for enum, port in enumerate(self.midi.get_midi_output_ports()):
             print(f'Port # {enum}  {port}')
+
