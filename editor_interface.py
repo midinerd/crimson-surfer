@@ -10,11 +10,8 @@ class EditorInterface:
     Provides the methods to control the Nord Modular Editor from
     another Python module
     """
-    def __init__(self, path, midi_channel, note_delay, num_notes):
-        self.editor_path = path
-        self.midi_channel = midi_channel
-        self.note_delay = note_delay
-        self.num_notes = num_notes
+    def __init__(self, editor_path ):
+        self.editor_path = editor_path
         self.editor = None
 
 
@@ -39,15 +36,3 @@ class EditorInterface:
 
 
         return status
-    
-    def play_patches(self, patch_file):
-        """
-        Loop over all of the patches in patch_file. When playing all of the patches is done,
-        should this function terminate the editor ????
-
-        This function will handle all exception handling so that the user doesn't need to
-        
-        Args:
-            patch_file (_type_): _description_
-        """
-        pass
