@@ -23,6 +23,7 @@ def process_cmd_line():
     parser.add_argument('--patchdir', default=None, help='The directory where the patches are located. The default directory is "patches" in the current directory.')
     parser.add_argument('--play', default=False, action='store_true', help='Start the Nord Editor, send it a patch and some notes to play it.')
     parser.add_argument('--showports', default=False, action='store_true', help='Display the Midi out ports on the system.')
+    parser.add_argument('--allnotesoff', default=False, action='store_true', help='Turn off all notes on all channels.')
 
     args = parser.parse_args()
 
@@ -63,6 +64,9 @@ def main():
                 patch_dir = 'patches' # default patch directory when the user doesn't specify one
             max_patchfile = str(Path(rf'{patch_dir}\g1-patches-max.txt').resolve())
             
+            if args.allnotesoff:
+                player.all_notes_off()
+                
             if args.maketext:      
                 status = player.make_textfile(patch_dir, max_patchfile)
 

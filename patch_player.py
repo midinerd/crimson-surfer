@@ -135,6 +135,7 @@ class PatchPlayer:
                         self.send_notes()
                     time.sleep(4)
             except KeyboardInterrupt:
+                self.all_notes_off()
                 print("\n\tUSER ABORT\n\n")
         else:
             status = 1
@@ -157,3 +158,9 @@ class PatchPlayer:
         for enum, port in enumerate(self.midi.get_midi_output_ports()):
             print(f'Port # {enum}  {port}')
 
+
+    def all_notes_off(self):
+        """Turn off all notes on all channels, in case some notes get stuck on
+        """
+        print('\nTurning off all notes, all channels.')
+        self.midi.panic()
