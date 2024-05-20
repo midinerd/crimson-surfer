@@ -14,7 +14,10 @@ class MidiInterface:
         self.input_port = None
         self.midi_channel = midi_channel
         
-        self.output_port = mido.open_output(self.output_port_name)
+        try:
+            self.output_port = mido.open_output(self.output_port_name)
+        except OSError as exc:
+            raise OSError(f"\nERROR. Unable to open MIDI Out port: '{self.output_port_name}'") from exc
 
     def get_midi_output_ports(self):
         """Display the output MIDI ports, the user will choose one

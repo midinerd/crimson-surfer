@@ -50,23 +50,27 @@ def main():
     args = process_cmd_line()
     
     if args is not None:
-        player = PatchPlayer()
-
-        if args.patchdir is not None:
-            patch_dir = args.patchdir # the user specified a patch directory on the cmd line
+        try:
+            player = PatchPlayer()
+        except OSError as exc:
+            status = 1
+            print(f'{exc}')
         else:
-            patch_dir = 'patches' # default patch directory when the user doesn't specify one
-        max_patchfile = str(Path(rf'{patch_dir}\g1-patches-max.txt').resolve())
-        
-        if args.maketext:      
-            status = player.make_textfile(patch_dir, max_patchfile)
+            if args.patchdir is not None:
+                patch_dir = args.patchdir # the user specified a patch directory on the cmd line
+            else:
+                patch_dir = 'patches' # default patch directory when the user doesn't specify one
+            max_patchfile = str(Path(rf'{patch_dir}\g1-patches-max.txt').resolve())
+            
+            if args.maketext:      
+                status = player.make_textfile(patch_dir, max_patchfile)
 
-        if args.showpatch is not None:
-            patch_number = args.showpatch
-            status = player.show_patch(max_patchfile, patch_number)
+            if args.showpatch is not None:
+                patch_number = args.showpatch
+                status = player.show_patch(max_patchfile, patch_number)
 
-        if args.play:
-            status = player.play_patches(max_patchfile)
+            if args.play:
+                status = player.play_patches(max_patchfile)
 
         if args.showports:
             player.show_ports()
