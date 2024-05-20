@@ -22,7 +22,7 @@ class PatchPlayer:
 
     def __init__(self):
         self.editor_params = read_config_file()
-        self.midi_interface = MidiInterface(self.editor_params.midi_port, self.editor_params.midi_channel)
+        self.midi = MidiInterface(self.editor_params.midi_port, self.editor_params.midi_channel)
 
         # create an instance of the editor interface so that this program can send patches to the editor
         self.editor = EditorInterface(self.editor_params.editor_path)
@@ -56,15 +56,14 @@ class PatchPlayer:
         return status
 
     def send_notes(self):
-        """_summary_
+        """Send midi notes to the midi out port, using the note sequence
+        read from the config file
         """
-        # params = EditorParams(editor_path, midi_port, midi_channel, note_delay, midi_notes)
-
         midi_notes = self.editor_params.midi_notes
         for this_note in midi_notes:
-            self.midi_interface.send_note(this_note)
+            self.midi.send_note(this_note)
             time.sleep(2) #
-            self.midi_interface.panic() # turn notes off before going to the next patch
+            self.midi.panic() # turn notes off before going to the next patch
 
     def read_patches(self, max_patchfile):
         """
@@ -126,7 +125,7 @@ class PatchPlayer:
 
     def make_textfile(self, patch_dir, max_patch_file):
         """
-        Iterate over a list of patch names, replace the \\ be changed to / to be comptible with MAX/Msp
+        Iterate over a list of patch names, replace the \\ be changed to / to be compatible with Max/MSP
         """
         status = 0
 
@@ -155,5 +154,5 @@ class PatchPlayer:
         """Display the MIDI out ports so the user can choose which one to use
         """
         print("\nMidi Out Ports available to this program.\n")
-        for enum, port in enumerate(self.midi_interface.get_midi_output_ports()):
+        for enum, port in enumerate(self.midi.get_midi_output_ports()):
             print(f'Port # {enum}  {port}')
