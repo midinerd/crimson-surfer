@@ -3,15 +3,18 @@ MIDI port access easier for the user
 """
 
 import mido
+# from mido import open_output
 # import mido.backends.portmidi
 
 class MidiInterface:
     """ Provide simple access to the midi ports
     """
-    def __init__(self) -> None:
-        self.output_port = None
+    def __init__(self, output_port_name, midi_channel) -> None:
+        self.output_port_name = output_port_name
         self.input_port = None
-        self.midi_channel = 0
+        self.midi_channel = midi_channel
+        
+        self.output_port = mido.open_output(self.output_port_name)
 
     def get_midi_output_ports(self):
         """Display the output MIDI ports, the user will choose one
@@ -24,3 +27,18 @@ class MidiInterface:
         another method
         """
         return mido.get_input_ports()
+    
+    def send_note(self, note_number):
+        """_summary_
+
+        Args:
+            note_number (_type_): _description_
+        """
+        note_msg = mido.Message('note_on', time=1, note=note_number, velocity=127)
+        self.output_port.send(note_msg)
+
+    def panic(self):
+        """
+        Send All Notes off on all channels
+        """
+        self.output_port.panic()
