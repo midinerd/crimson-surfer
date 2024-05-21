@@ -5,7 +5,7 @@ import configparser as cfg
 EditorParams = namedtuple("Params", "editor_path midi_port midi_channel note_delay midi_notes")
 
 
-def read_config_file(config_file='editor_config.ini') -> EditorParams:
+def read_config_file(synth_type, config_file='editor_config.ini') -> EditorParams:
     """
     Read the parameters from the config file so that the program
     knows where the editor is and which midi channel to use.
@@ -26,8 +26,7 @@ def read_config_file(config_file='editor_config.ini') -> EditorParams:
         print(f'\nERROR occurred reading config file: {config_file}\n')
         return None
 
-
-    editor_path = config['PATH']['nordeditor']
+    editor_path = config[f'{synth_type}_PATH']['nordeditor']
     midi_port = config['MIDI']['midi_port_name']
     midi_channel = int(config['MIDI']['midi_channel'])
     note_delay = int(config['NOTES']['note_delay'])

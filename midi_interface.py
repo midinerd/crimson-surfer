@@ -15,6 +15,7 @@ class MidiInterface:
         self.midi_channel = midi_channel
         
         try:
+            # if this isn't successful, the
             self.output_port = mido.open_output(self.output_port_name)
         except OSError as exc:
             raise OSError(f"\nERROR. Unable to open MIDI Out port: '{self.output_port_name}'") from exc

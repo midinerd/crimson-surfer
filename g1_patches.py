@@ -24,6 +24,8 @@ def process_cmd_line():
     parser.add_argument('--play', default=False, action='store_true', help='Start the Nord Editor, send it a patch and some notes to play it.')
     parser.add_argument('--showports', default=False, action='store_true', help='Display the Midi out ports on the system.')
     parser.add_argument('--allnotesoff', default=False, action='store_true', help='Turn off all notes on all channels.')
+    parser.add_argument('--g1', default=False, action='store_true', help='Select Nord Modular G1 Editor.')
+    parser.add_argument('--g2', default=False, action='store_true', help='Select Nord Modular G2 Editor.')
 
     args = parser.parse_args()
 
@@ -51,18 +53,28 @@ def main():
     args = process_cmd_line()
     player = None
     
+    synth_type = ''
     if args is not None:
+        
+        if args.g1:
+            synth_type="g1"
+
+        if args.g2:
+            synth_type="g2"
+            
         try:
-            player = PatchPlayer()
+            player = PatchPlayer(synth_type)
         except OSError as exc:
             status = 1
             print(f'{exc}')
         else:
+        
             if args.patchdir is not None:
                 patch_dir = args.patchdir # the user specified a patch directory on the cmd line
             else:
                 patch_dir = 'patches' # default patch directory when the user doesn't specify one
-            max_patchfile = str(Path(rf'{patch_dir}\g1-patches-max.txt').resolve())
+            # max_patchfile = str(Path(rf'{patch_dir}\g1-patches-max.txt').resolve())
+            max_patchfile = str(Path(rf'{patch_dir}\{synth_type}-patches-max.txt').resolve())
             
             if args.allnotesoff:
                 player.all_notes_off()

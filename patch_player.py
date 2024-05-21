@@ -11,7 +11,7 @@ from editor_interface import EditorInterface
 
 # from config_reader import EditorParams
 from config_reader import read_config_file
-from config_reader import EditorParams
+# from config_reader import EditorParams
 
 
 class PatchPlayer:
@@ -20,8 +20,9 @@ class PatchPlayer:
 
     """
 
-    def __init__(self):
-        self.editor_params = read_config_file()
+    def __init__(self, synth_type):
+        self.synth_type = synth_type
+        self.editor_params = read_config_file(self.synth_type.upper())
         self.midi = MidiInterface(self.editor_params.midi_port, self.editor_params.midi_channel)
 
         # create an instance of the editor interface so that this program can send patches to the editor
@@ -78,12 +79,12 @@ class PatchPlayer:
 
     def generate_patch_file(self, patch_dir):
         """
-        Return a generator object of G1 patch names, return them to the caller as a Python list, for simple iteration.
+        Return a generator object of G1/G2 patch names, return them to the caller as a Python list, for simple iteration.
         """
         
-        print(f"\nMaking catalog of G1 patches found in directory: {patch_dir}")
-        # return list(Path(patch_dir).rglob('*.pch', case_sensitive=None))
-        return Path(patch_dir).rglob('*.pch', case_sensitive=None)
+        print(f"\nMaking catalog of {self.synth_type} patches found in directory: {patch_dir}")
+        patchname_ext = 'pch' if self.synth_type == 'G1' else 'pch2'
+        return Path(patch_dir).rglob(f'*.{patchname_ext}', case_sensitive=None)
 
 
     def make_textfile(self, patch_dir, max_patch_file):
@@ -126,7 +127,7 @@ class PatchPlayer:
             status = 0
             try:
                 for patch_num, this_patch in enumerate(patch_names, start=1):
-                    print(f"\t{patch_num:5} SENDING: '{this_patch}'")
+                    print(f"\t{patch_num:5} PLAYING: '{this_patch}'")
                     status = self.editor.send_patch(this_patch)
                     if status:
                         print(f'\n\nAn error occurred while sending "{Path(this_patch).name}" to the editor.')
