@@ -21,8 +21,8 @@ class PatchPlayer:
     """
 
     def __init__(self, synth_type):
-        self.synth_type = synth_type
-        self.editor_params = read_config_file(self.synth_type.upper())
+        self.synth_type = synth_type.upper()
+        self.editor_params = read_config_file(self.synth_type)
         self.midi = MidiInterface(self.editor_params.midi_port, self.editor_params.midi_channel)
 
         # create an instance of the editor interface so that this program can send patches to the editor
@@ -137,6 +137,7 @@ class PatchPlayer:
                     time.sleep(4)
             except KeyboardInterrupt:
                 self.all_notes_off()
+                self.terminate_process()
                 print("\n\tUSER ABORT\n\n")
         else:
             status = 1
@@ -165,3 +166,8 @@ class PatchPlayer:
         """
         print('\nTurning off all notes, all channels.')
         self.midi.panic()
+        
+    def terminate_process(self):
+        """Utility method to provide a way to terminate the subprocess
+        """
+        self.editor.terminate_process()

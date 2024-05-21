@@ -7,39 +7,6 @@ import sys
 
 from patch_player import PatchPlayer
 
-def process_cmd_line_ORIG():
-    """
-    Create the Argument parser for the cmd line options
-    Returns:
-        Argparse Namespace: Namespace and values created based on the cmd line arguments passed in
-    """
-    parser = argparse.ArgumentParser(
-                        # prog='g1_patches',
-                        prog=__file__,
-                        description='Creates a texfile containing the filenames of Nord Modular G1/G2 patch names.',
-                        epilog='') # shown at the bottom of the help message
-    
-    parser.add_argument('--maketext', default=False, action='store_true', help='Create a text file containing the full path to the patch names.')
-    parser.add_argument('--showpatch', default=None, type=int, metavar='PATCH_NUMBER', help='Show the patch name specified by the patch number. This assumes the program has been previously run with the "maketext" argument.')
-    parser.add_argument('--patchdir', default=None, help='The directory where the patches are located. The default directory is "patches" in the current directory.')
-    parser.add_argument('--play', default=False, action='store_true', help='Start the Nord Editor, send it a patch and some notes to play it.')
-    parser.add_argument('--showports', default=False, action='store_true', help='Display the Midi out ports on the system.')
-    parser.add_argument('--allnotesoff', default=False, action='store_true', help='Turn off all notes on all channels.')
-    parser.add_argument('--g1', default=False, action='store_true', help='Select Nord Modular G1 Editor.')
-    parser.add_argument('--g2', default=False, action='store_true', help='Select Nord Modular G2 Editor.')
-
-    args = parser.parse_args()
-
-    # check for no arguments passed, print help message
-    if len(sys.argv) == 1:
-        args = None # tells the caller to exit
-        print()
-        parser.print_help() # show the help message when no arguments are passed.
-
-    return args
-
-
-
 def process_cmd_line():
     """
     Create the Argument parser for the cmd line options
@@ -59,13 +26,11 @@ def process_cmd_line():
 
     parser.add_argument('--showports', default=False, action='store_true', help='Display the Midi out ports on the system.')
 
+    parser.add_argument('--synth_type', choices=["g1","g2"], help='Specify the G1 or G2 editor to play the patches.')
+
     play_group = parser.add_mutually_exclusive_group()
     play_group.add_argument('--play', default=False, action='store_true', help='Start the Nord Editor, send it a patch and some notes to play it.')
     play_group.add_argument('--allnotesoff', default=False, action='store_true', help='Turn off all notes on all channels.')
-
-    synth_group = parser.add_mutually_exclusive_group(required=True)
-    synth_group.add_argument('--g1', default=False, action='store_true', help='Select Nord Modular G1 Editor.')
-    synth_group.add_argument('--g2', default=False, action='store_true', help='Select Nord Modular G2 Editor.')
 
     args = parser.parse_args()
 
@@ -92,22 +57,19 @@ def main():
     args = process_cmd_line()
     player = None
     
-    synth_type = ''
     if args is not None:
         
-        if args.g1:
-            synth_type="g1"
-
-        if args.g2:
-            synth_type="g2"
-            
+        synth_type = args.synth_type
         try:
             player = PatchPlayer(synth_type)
         except OSError as exc:
             status = 1
             print(f'{exc}')
         else:
-        
+            # make sure that the subprocess is killed when the program exits, normally and
+            # otherwise
+            # atexit.register(player.terminate_process)
+            
             if args.patchdir is not None:
                 patch_dir = args.patchdir # the user specified a patch directory on the cmd line
             else:
@@ -130,6 +92,8 @@ def main():
             if args.showports:
                 player.show_ports()
 
+        if player:
+            player.terminate_process()
         print(f'\n\t Exiting the program with status: {status}\n\n')
     else:
         status = 1 # error
