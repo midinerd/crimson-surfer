@@ -9,16 +9,16 @@ from patch_player import PatchPlayer
 
 def process_cmd_line():
     """
-    Create the Argumnet parser for the cmd line options
+    Create the Argument parser for the cmd line options
     Returns:
         Argparse Namespace: Namespace and values created based on the cmd line arguments passed in
     """
     parser = argparse.ArgumentParser(
                         prog='g1_patches',
-                        description='Creates a texfile containing the filenames of Nord Modular G1 patches.',
+                        description='Creates a texfile containing the filenames of Nord Modular G1/G2 patch names.',
                         epilog='') # shown at the bottom of the help message
     
-    parser.add_argument('--maketext', default=False, action='store_true', help='Create a text file containing all of the Nord Modular patch names.')
+    parser.add_argument('--maketext', default=False, action='store_true', help='Create a text file containing the full path to the patch names.')
     parser.add_argument('--showpatch', default=None, type=int, metavar='PATCH_NUMBER', help='Show the patch name specified by the patch number. This assumes the program has been previously run with the "maketext" argument.')
     parser.add_argument('--patchdir', default=None, help='The directory where the patches are located. The default directory is "patches" in the current directory.')
     parser.add_argument('--play', default=False, action='store_true', help='Start the Nord Editor, send it a patch and some notes to play it.')
@@ -73,7 +73,6 @@ def main():
                 patch_dir = args.patchdir # the user specified a patch directory on the cmd line
             else:
                 patch_dir = 'patches' # default patch directory when the user doesn't specify one
-            # max_patchfile = str(Path(rf'{patch_dir}\g1-patches-max.txt').resolve())
             max_patchfile = str(Path(rf'{patch_dir}\{synth_type}-patches-max.txt').resolve())
             
             if args.allnotesoff:
