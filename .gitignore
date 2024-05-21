@@ -11,7 +11,7 @@ __pycache__/
 # vscode
 .vscode/
 
-# g1 patch auditor
+# patches for the G1 & g2 editors
 *patches/
 
 # Distribution / packaging
