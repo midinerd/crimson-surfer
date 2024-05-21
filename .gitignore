@@ -12,7 +12,7 @@ __pycache__/
 .vscode/
 
 # g1 patch auditor
-patches/
+*patches/
 
 # Distribution / packaging
 .Python
