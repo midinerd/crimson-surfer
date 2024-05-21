@@ -7,14 +7,15 @@ import sys
 
 from patch_player import PatchPlayer
 
-def process_cmd_line():
+def process_cmd_line_ORIG():
     """
     Create the Argument parser for the cmd line options
     Returns:
         Argparse Namespace: Namespace and values created based on the cmd line arguments passed in
     """
     parser = argparse.ArgumentParser(
-                        prog='g1_patches',
+                        # prog='g1_patches',
+                        prog=__file__,
                         description='Creates a texfile containing the filenames of Nord Modular G1/G2 patch names.',
                         epilog='') # shown at the bottom of the help message
     
@@ -37,6 +38,44 @@ def process_cmd_line():
 
     return args
 
+
+
+def process_cmd_line():
+    """
+    Create the Argument parser for the cmd line options
+    Returns:
+        Argparse Namespace: Namespace and values created based on the cmd line arguments passed in
+    """
+    parser = argparse.ArgumentParser(
+                        # prog='g1_patches',
+                        prog=__file__,
+                        description='Creates a texfile containing the filenames of Nord Modular G1/G2 patch names.',
+                        epilog='') # shown at the bottom of the help message
+    
+    parser.add_argument('--maketext', default=False, action='store_true', help='Create a text file containing the full path to the patch names.')
+    parser.add_argument('--patchdir', default=None, help='The directory where the patches are located. The default directory is "patches" in the current directory.')
+
+    parser.add_argument('--showpatch', default=None, type=int, metavar='PATCH_NUMBER', help='Show the patch name specified by the patch number. This assumes the program has been previously run with the "maketext" argument.')
+
+    parser.add_argument('--showports', default=False, action='store_true', help='Display the Midi out ports on the system.')
+
+    play_group = parser.add_mutually_exclusive_group()
+    play_group.add_argument('--play', default=False, action='store_true', help='Start the Nord Editor, send it a patch and some notes to play it.')
+    play_group.add_argument('--allnotesoff', default=False, action='store_true', help='Turn off all notes on all channels.')
+
+    synth_group = parser.add_mutually_exclusive_group(required=True)
+    synth_group.add_argument('--g1', default=False, action='store_true', help='Select Nord Modular G1 Editor.')
+    synth_group.add_argument('--g2', default=False, action='store_true', help='Select Nord Modular G2 Editor.')
+
+    args = parser.parse_args()
+
+    # check for no arguments passed, print help message
+    if len(sys.argv) == 1:
+        args = None # tells the caller to exit
+        print()
+        parser.print_help() # show the help message when no arguments are passed.
+
+    return args
 
 
 # https://github.com/jeremybernstein/shell/releases
