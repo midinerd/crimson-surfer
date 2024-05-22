@@ -2,15 +2,16 @@ import subprocess
 import os
 import time
 
-# happens to be where my editor is stored:
+# where my editor is stored:
 editor_location = r"G:\audio\nord\g1_editor\Nord Modular Editor v3.03.exe"
 
-# 2 patches on my machine:
+# 2 patch paths
 p1 = r"G:\audio\g1\behind-the-locked-door.pch"
 p2 = r"G:\audio\g1\choke-gen-2.pch"
 
-# I'll use this later
+# iterable for cycling through the patches
 patches = [p1, p2]
+
 
 def load_patch(patch_location):
     patch_open_cmd = [editor_location, patch_location]
@@ -27,10 +28,9 @@ def kill_editor():
     print(f'Finished sending kill cmd: {kill_cmd}')
     os.system('dir')
 
+
 def cycle_patches():
-    # this cycling isn't really necessary but I want to pretend like there's a longer list.
-    # and I only have 2.
-    
+    # this is just to emulate that there's many patches being cycled through instead of the meager 2
     cycle_count = 4
     patch_cieling = len(patches)
     idx = 0
@@ -40,6 +40,7 @@ def cycle_patches():
         idx += 1
         time.sleep(5)
 
+
 def run_demo():
     cycle_patches()
     kill_editor()
@@ -47,6 +48,7 @@ def run_demo():
 
 def main():
     run_demo()
+
 
 if __name__ == "__main__":
     run_demo()
