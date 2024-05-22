@@ -12,7 +12,7 @@ class EditorInterface:
     """
     def __init__(self, editor_path ):
         self.editor_path = editor_path
-        self.process = None
+        self.processes = []
 
 
     def send_patch(self, absolute_path_to_patch):
@@ -25,7 +25,7 @@ class EditorInterface:
         status = 0
         try:
             args = [self.editor_path, absolute_path_to_patch.strip()]
-            self.process = sub.Popen(args, universal_newlines=True, shell=False)
+            self.processes.append(sub.Popen(args, universal_newlines=True, shell=False))
             # self.editor.stdin.write(absolute_path_to_patch) # writing to stdin doesn't work
         except FileNotFoundError:
             status = 1
@@ -42,11 +42,17 @@ class EditorInterface:
         any zombies running.
         """
         status = 0
-        if self.process is not None:
-            print(f"\nTerminating subprocess ID: {self.process.pid}")
-            self.process.terminate() # it looks like the editor was terminated, but can still be seen running in Task Manager
-            self.process.wait(45)
-        else:
-            print("\nSubprocess is not running, so nothing to terminate.")
-            
+
+        # gotta be an admin for this
+        # result = sub.run(["taskkill", "/im", Path(self.editor_path).name, "/f", "/t"], timeout=10)
+        term_proc = sub.Popen(["taskkill", "/im", Path(self.editor_path).name, "/f", "/t"])
+        print(f"\nReturn code from termination: {term_proc.returncode}")            
+        #status = term_proc.returncode
+        
+        # this seems to work- gotta be an admin
+        # for proc in self.processes:
+        #     print(f"\nTerminating subprocess ID: {proc.pid}")
+        #     # proc.kill()
+        #     # proc.terminate() # it looks like the editor was terminated, but can still be seen running in Task Manager
+        #     # self.process.wait(45)
         return status
