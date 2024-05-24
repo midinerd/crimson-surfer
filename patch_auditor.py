@@ -17,7 +17,7 @@ def process_cmd_line():
                         # prog='g1_patches',
                         prog=__file__,
                         description='Creates a texfile containing the filenames of Nord Modular G1/G2 patch names.',
-                        epilog='') # shown at the bottom of the help message
+                        epilog='\n                            ******** This program MUST be run from a Windows command prompt with ADMINISTRATOR PRIVELEGES ********\n') # shown at the bottom of the help message
     
     parser.add_argument('--maketext', default=False, action='store_true', help='Create a text file containing the full path to the patch names.')
     parser.add_argument('--patchdir', default=None, help='The directory where the patches are located. The default directory is "patches" in the current directory.')
