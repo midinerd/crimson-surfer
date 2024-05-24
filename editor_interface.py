@@ -13,8 +13,23 @@ class EditorInterface:
     def __init__(self, editor_path ):
         self.editor_path = editor_path
         self.processes = []
-
-
+        self.start_editor()
+        
+    def start_editor(self):
+        """Start the editor without any patch arguments. The editor takes a few seconds to come up (on slower systems). This way, when the program starts
+        sending patches, the editor will already be running an no notes will be missing/lsot due to the slow startup.
+        """
+        status = 0
+        try:
+            args = [self.editor_path]
+            self.processes.append(sub.Popen(args, universal_newlines=True, shell=False))
+        except FileNotFoundError:
+            status = 1
+            print(f"\nERROR: File Not Found: {self.editor_path}\n")
+        except sub.SubprocessError as exc:
+            status = 1
+            print(f'\nERROR occurred launching {self.editor_path}. Verify that the patch is correct.: {exc}\n\n')
+        
     def send_patch(self, absolute_path_to_patch):
         """
         Send a patch to the Nord editor 
@@ -43,7 +58,7 @@ class EditorInterface:
         """
         status = 0
 
-        # this seems to work- gotta be an admin
+        # FOR THIS TO WORK, THE USER ***MUST*** RUN THE PROGRAM AS ADMINISTRATOR
         print(f"\nTerminating {len(self.processes)} subprocesses\n")
         for proc in self.processes:
             print(f"Terminating subprocess ID: {proc.pid}")

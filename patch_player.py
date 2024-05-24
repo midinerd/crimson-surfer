@@ -27,6 +27,7 @@ class PatchPlayer:
 
         # create an instance of the editor interface so that this program can send patches to the editor
         self.editor = EditorInterface(self.editor_params.editor_path)
+        time.sleep(4) # give the editor a few seconds to initialize, before sending it any patches
 
 
     def read_patches(self, max_patchfile):
