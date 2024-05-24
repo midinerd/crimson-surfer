@@ -12,7 +12,11 @@ __pycache__/
 .vscode/
 
 # patches for the G1 & g2 editors
-*patches/
+*patches*/
+
+*.pch
+*.pch2
+*.prf2
 
 # Distribution / packaging
 .Python
