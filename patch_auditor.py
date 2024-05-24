@@ -1,6 +1,7 @@
 # copyright crissaegrim/midinerd(c) 2024  whatever that means.
 
 import argparse
+import atexit
 from pathlib import Path
 import sys
 
@@ -62,6 +63,7 @@ def main():
         synth_type = args.synth_type
         try:
             player = PatchPlayer(synth_type)
+            atexit.register(player.terminate_process) # this ensures the subprocesses are terminated if something bad happens
         except OSError as exc:
             status = 1
             print(f'{exc}')
