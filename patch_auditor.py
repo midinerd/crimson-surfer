@@ -63,15 +63,13 @@ def main():
         synth_type = args.synth_type
         try:
             player = PatchPlayer(synth_type)
-            atexit.register(player.terminate_process) # this ensures the subprocesses are terminated if something bad happens
         except OSError as exc:
             status = 1
             print(f'{exc}')
         else:
-            # make sure that the subprocess is killed when the program exits, normally and
-            # otherwise
-            # atexit.register(player.terminate_process)
-            
+            # this ensures the subprocesses are terminated if something bad happens
+            atexit.register(player.terminate_process) 
+
             if args.patchdir is not None:
                 patch_dir = args.patchdir # the user specified a patch directory on the cmd line
             else:
@@ -94,8 +92,6 @@ def main():
             if args.showports:
                 player.show_ports()
 
-        if player:
-            player.terminate_process()
         print(f'\n\t Exiting the program with status: {status}\n\n')
     else:
         status = 1 # error
