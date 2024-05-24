@@ -56,6 +56,7 @@ class EditorInterface:
         status = self._process_common(absolute_path_to_patch)
         if status:
             print(f'\nERROR occurred sending {Path(absolute_path_to_patch).name} to the Nord Editor:\n')
+        return status
 
     def terminate_process(self):
         """Provide a method to the caller to terminate the subprocess so as not to leave
