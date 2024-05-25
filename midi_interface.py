@@ -3,12 +3,11 @@ MIDI port access easier for the user
 """
 
 import mido
-# from mido import open_output
-# import mido.backends.portmidi
+
 
 class MidiInterface:
     """ Provide simple access to the midi ports
-    """
+    """copy 
     def __init__(self, output_port_name, midi_channel) -> None:
         self.output_port_name = output_port_name
         self.input_port = None
