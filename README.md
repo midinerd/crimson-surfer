@@ -5,23 +5,32 @@
 Crimson_surfer is an idea originally conceived by crissaegrim/midinerd in order to make it easy to listen to directories full of patch files
 for the Clavia Nord Modular (G1) virtual modular synthesizer.
 
-The original implementation was a clever combination of a Python program which feeds a list of G1 patch names into Max/MSP. Max would "send" the patch file
-to the Nord Modular Editor program, follwed by a series of MIDI notes to the Noed Modular synthesizer. This made it easy to listen to a bunch of patches without the drudgery
-of having to loead each one manually.
+The "original implementation" was a clever combination of a Python program which feeds a list of G1 patch names into Max/MSP. Max would "send" the patch file
+to the Nord Modular Editor program, followed by a series of MIDI notes to the Nord Modular synthesizer. This makes it very easy to listen to many patches without the drudgery of having to load each one manually.
+
+Later modifications by Reddy Kilowatt (Tony Cappellini) removed the need for Max/MSP to
+send the MIDI notes to the synthesizer. A pure-python implementation is the result, thanks to the MIDO Python library.
+
 
 
 
 ## System Requirements
-Windows 10 (The professional version was used for development, other versions have not been tested but are expected to work as well.)
-Python 3 (if you want to run crimson_surfer from source, otherwise a stand-alone version will be available for those who don't have Python installed.)
+* A PC with Windows 10 (The professional version was used for development, other versions have not been tested but are expected to work as well.)
+* Python 3 (if you want to run crimson_surfer from source, otherwise a stand-alone version will be available for those who don't have Python installed.)
+* The Nord Modular (G1) Editor or
+* The Nord Modular (G2) Editor or
+* The Nord Modular (G2) Demo Editor (no hardware synthesizer is required.)
+
 
 
 ## Hardware Requirements
-a Midi Port
-A Nord Modular G1 Synthesizer or a Nord Modular G2 Synthesizer (the G2 Demo Editor also works)
+* A MIDI interface.
+* A Nord Modular G1 Synthesizer or
+* A Nord Modular G2 Synthesizer
 
 
 
+ORIGINAL DESCRIPTION: to be deleted and added above.
 Tested on Windows 10:
 
 Crimson Surfer is a collection of technologies that take a G1 Nord Modular and Windows10 PC with python & Max/MSP into an automated patch-file demonstrator.
@@ -35,14 +44,5 @@ At the time of commit its behavior is:
  - Then max will increment the line# of patch filepath to load and repeat this process
  - The user may press shift+spacebar to log the given filepath & note-number if they like what they hear.
 
-# Requirements:
-
-- Max/MSP
-- Python 3
-- `shell` External from Cycling'74 repo: [releases] (https://github.com/jeremybernstein/shell/releases)
-- - add `shell` to max/msp's external paths
-- The G1 Editor
-- A Nord Modular G1
-- The Max/MSP patcher will need its midi output port set to the port of your Nord Modular G1
 
 
