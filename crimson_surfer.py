@@ -15,7 +15,6 @@ def process_cmd_line():
         Argparse Namespace: Namespace and values created based on the cmd line arguments passed in
     """
     parser = argparse.ArgumentParser(
-                        # prog='g1_patches',
                         prog=__file__,
                         description='Creates a texfile containing the filenames of Nord Modular G1/G2 patch names.',
                         epilog='\n                            ******** This program MUST be run from a Windows command prompt with ADMINISTRATOR PRIVELEGES ********\n') # shown at the bottom of the help message
@@ -72,7 +71,6 @@ def main():
                 patch_dir = args.patchdir # the user specified a patch directory on the cmd line
             else:
                 patch_dir = 'patches' # default patch directory when the user doesn't specify one
-            # max_patchfile = str(Path(rf'{patch_dir}\{synth_type}-patches-max.txt').resolve())
             max_patchfile = str(Path(rf'{patch_dir}\{synth_type}-playlist.txt').resolve())
             
             if args.allnotesoff:
