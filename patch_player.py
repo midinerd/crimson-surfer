@@ -46,7 +46,7 @@ class PatchPlayer:
                 # patches = fh_in.readlines()
                 patches = fh_in.read().splitlines() # gets rid of the newline at the end
         else:
-            print(f"\nERROR: {max_patchfile} does not exist. You must run the program with the --maketext argument, FIRST.\n")
+            print(f"\nERROR: {max_patchfile} does not exist. You must run the program with the --makeplaylist argument, FIRST.\n")
         return patches
 
 
@@ -88,9 +88,13 @@ class PatchPlayer:
         return Path(patch_dir).rglob(f'*.{patchname_ext}', case_sensitive=None)
 
 
-    def make_textfile(self, patch_dir, max_patch_file):
+    def make_playlist(self, patch_dir, max_patch_file):
         """
-        Iterate over a list of patch names, replace the \\ be changed to / to be compatible with Max/MSP
+        Iterate over a directiry containing patches, in order to creater a playlist for this program.
+        The playlist will be used during subsequent program invocations. The program will iterate over the playlist
+        and load those patches into the derisdr
+        
+        replace the \\ be changed to / to be compatible with Max/MSP
         """
         status = 0
 

@@ -20,7 +20,7 @@ def process_cmd_line():
                         description='Creates a texfile containing the filenames of Nord Modular G1/G2 patch names.',
                         epilog='\n                            ******** This program MUST be run from a Windows command prompt with ADMINISTRATOR PRIVELEGES ********\n') # shown at the bottom of the help message
     
-    parser.add_argument('--maketext', default=False, action='store_true', help='Create a text file containing the full path to the patch names.')
+    parser.add_argument('--makeplaylist', default=False, action='store_true', help='Create a playlist containing the full path to the patch names that were found.')
     parser.add_argument('--patchdir', default=None, help='The directory where the patches are located. The default directory is "patches" in the current directory.')
 
     parser.add_argument('--showpatch', default=None, type=int, metavar='PATCH_NUMBER', help='Show the patch name specified by the patch number. This assumes the program has been previously run with the "maketext" argument.')
@@ -44,8 +44,6 @@ def process_cmd_line():
     return args
 
 
-# https://github.com/jeremybernstein/shell/releases
-# the MAX shell object - binaries
 def main():
     """
     Entry point for the program
@@ -74,13 +72,14 @@ def main():
                 patch_dir = args.patchdir # the user specified a patch directory on the cmd line
             else:
                 patch_dir = 'patches' # default patch directory when the user doesn't specify one
-            max_patchfile = str(Path(rf'{patch_dir}\{synth_type}-patches-max.txt').resolve())
+            # max_patchfile = str(Path(rf'{patch_dir}\{synth_type}-patches-max.txt').resolve())
+            max_patchfile = str(Path(rf'{patch_dir}\{synth_type}-playlist.txt').resolve())
             
             if args.allnotesoff:
                 player.all_notes_off()
                 
-            if args.maketext:      
-                status = player.make_textfile(patch_dir, max_patchfile)
+            if args.makeplaylist:      
+                status = player.make_playlist(patch_dir, max_patchfile)
 
             if args.showpatch is not None:
                 patch_number = args.showpatch
